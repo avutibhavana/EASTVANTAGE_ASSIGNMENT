@@ -5,9 +5,9 @@ from database import SessionLocal,engine
 from sqlalchemy.orm import Session
 from fastapi import Depends,FastAPI,status,Response
 from pydantic import BaseModel
-
 import requests
 import urllib.parse
+from math import radians, cos, sin, asin, sqrt
 
 app = FastAPI()
 
@@ -59,10 +59,10 @@ def createCoordinates(reqbody: schemas.City,res:Response, db :Session = Depends(
 ##creating the row for the table
         row.city = city
         row.state = state
-        row.zipcode = zipcode
         row.country=country
-        row.longitude =  Data[0]
-        row.latitude =  Data[1]
+        row.zipcode = zipcode
+        row.longitude =  Data[1]
+        row.latitude =  Data[0]
 
 
 ##adding a row to the table
@@ -89,13 +89,13 @@ def updating(res:Response,reqbody: schemas.City,cityid,db:Session=Depends(getDb)
     
         Data = myCoordinates(address)
 ##updating the rows with the required fields
-        updatedRow ={}
-        updatedRow["city"] = city
-        updatedRow["state"] = state
-        updatedRow["zipcode"]= zipcode
-        updatedRow["longitude"] =  Data[0]
-        updatedRow["latitude"] = Data[1] 
-        
+        updatedRow ={
+        "city" : city,
+        "state" : state,
+        "zipcode": zipcode,
+        "longitude" :  Data[1],
+        "latitude" : Data[0]
+        }
         updating=db.query(models.Address).where(models.Address.id==cityid).update(updatedRow)
         if updating:
     ##   
@@ -139,6 +139,65 @@ def delete(res:Response,cityid,db:Session=Depends(getDb)):
             "status" : "failed",
             "msg" : str(e)
         }
+
+def dist(lat1, long1, lat2, long2):
+    """
+Replicating the same formula as mentioned in Wiki
+    """
+    # convert decimal degrees to radians
+    lat1, long1, lat2, long2 = map(radians, [lat1, long1, lat2, long2])
+    # haversine formula
+    dlon = long2 - long1
+    dlat = lat2 - lat1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    # Radius of earth in kilometers is 6371
+    km = 6371* c
+    return km
+
+
+
+@app.get("/fetchnearestaddress", status_code=status.HTTP_200_OK)
+def get_nearest_address(res: Response,  city, state,country,zipcode, db :Session = Depends(getDb)):
+    try:
+        address= city, state,country,zipcode
+
+        locationData = myCoordinates(address)
+  
+        allAddress = db.query(models.Address).all()
+
+        someAddress = []
+
+
+        for address in allAddress:
+                
+            distanceBetween = dist(float(locationData[0]), float(locationData[1]),address.latitude, address.longitude)
+            if distanceBetween <= 100:
+                someAddress.append(address)
+        
+
+        # sending the nearest address data to user
+        return {
+            "status": "ok",
+            "data" : someAddress
+        }
+
+    except Exception as e:
+        locationData = myCoordinates(address)
+        quaryCoordinate = locationData
+        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            "status" : quaryCoordinate,
+            "msg" : str(e)
+  
+            
+        }
+
+
+
+
+
+
 
 # {
 #   "city": "bihar",
