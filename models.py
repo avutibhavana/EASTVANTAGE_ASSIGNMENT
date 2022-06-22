@@ -1,6 +1,11 @@
 from database import Base
 from sqlalchemy import Column,Integer,String,Float
 
+
+## creating a table for database
+##creating all the columns in database
+
+
 class Address(Base):
     __tablename__="address"
 
@@ -13,7 +18,7 @@ class Address(Base):
     zipcode = Column(Integer)
     longitude = Column(Float)
     latitude = Column(Float)
-    mapUrl = Column(String)
+   
 
 
 

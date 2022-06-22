@@ -1,210 +1,144 @@
-# from numbers import Real
-# from time import timezone
-# from fastapi import FastAPI
-# from pydantic import BaseModel
-
-# import requests
-
-# import urllib.parse
-
-# app = FastAPI()
-
-# db = []
-
-# # address = 'Shivaji Nagar, Bangalore, KA 560001'
-# # url = 'https://nominatim.openstreetmap.org/search/' + \
-# #     urllib.parse.quote(address) + '?format=json'
-# # response_location = requests.get(url).json()
-# # print(response_location[0]["lat"])
-# # print(response_location[0]["lon"])
-# # {
-# #     "city": "Nagpur",
-# #     "state": "Maharashtra",
-# #     "country": "India",
-# #     "zipcode": "440001"
-# # }
-
-
-# class City(BaseModel):
-#     city: str
-#     state: str
-#     country: str
-#     zipcode: str
-
-
-# @app.get('/')
-# def index():
-#     return {'key': 'value'}
-
-
-# @app.get('/cities')
-# async def get_cities():
-#     results = []
-#     for address in db:
-#         address_var = (address['city'], ' , ', address['state'],
-#                        ' , ',   address['country'], ' , ', address['zipcode'])
-#         print(address_var)
-#         r = requests.get(
-#             f'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address_var)) + '?format=json')
-#         response_location = r.json()
-       
-#         results.append(
-#             {'city': address['city'], 'state': address['state'], 'country': address['country'], 'zipcode': address['zipcode'], 'latitude': response_location[0]["lat"], 'longitude': response_location[0]["lon"]})
-#     print(results,"bhavana")
-
-#     return results
-
-
-# @app.get('/cities/{city_id}')
-# def get_city(city_id: int):
-#     print(city_id)
-#     address = db[city_id-1]
-#     address_var = (address['city'], ' , ', address['state'],
-#                    ' , ',   address['country'], ' , ', address['zipcode'])
-#     #print('address:, ', address, address_var)
-#     r = requests.get(
-#         f'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address_var)) + '?format=json')
-#     response_location = r.json()
-#     return {'city': address['city'], 'state': address['state'], 'country': address['country'], 'zipcode': address['zipcode'], 'latitude': response_location[0]["lat"], 'longitude': response_location[0]["lon"]}
-
-
-# @app.post('/cities')
-# async def create_city(city: City):
-#     db.append(city.dict())
-#     return db[-1]
-
-
-# @app.put("/cities/{city_id}")
-# async def update_city(city_id: int, city: City):
-#     put_address = city.dict()
-#     print(put_address, city.dict())
-#     return {"city_id": city_id, **put_address}
-
-
-# @app.delete('/cities/{city_id}')
-# def delete_city(city_id: int):
-#     db.pop(city_id-1)
-#     return {}
-
-# # {
-# #   "city": "bihar",
-# #   "state": "patna",
-# #   "country": "string",
-# #   "zipcode": "400001"
-# # }
-
-
 from numbers import Real
 from time import timezone
-from fastapi import FastAPI,Depends
 import schemas,models
-from database import engine,SessionLocal
+from database import SessionLocal,engine
 from sqlalchemy.orm import Session
-
+from fastapi import Depends,FastAPI,status,Response
+from pydantic import BaseModel
 
 import requests
-
 import urllib.parse
 
 app = FastAPI()
 
+def myCoordinates(address):   
+    output = requests.get('https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address)) + '?format=json').json()
+    a=[output[0]["lat"] , output[0]["lon"]]
+    return a
+
+
 models.Base.metadata.create_all(engine)
 
-def get_db():
-    db=SessionLocal()
-
+def getDb():
+    db= SessionLocal()
     try:
         yield db
     finally:
+##db.close() will close the database
         db.close()
 
-db = []
+#get all the information
 
-# address = 'Shivaji Nagar, Bangalore, KA 560001'
-# url = 'https://nominatim.openstreetmap.org/search/' + \
-#     urllib.parse.quote(address) + '?format=json'
-# response_location = requests.get(url).json()
-# print(response_location[0]["lat"])
-# print(response_location[0]["lon"])
-# {
-#     "city": "Nagpur",
-#     "state": "Maharashtra",
-#     "country": "India",
-#     "zipcode": "440001"
-# }
-
-
-
-
-@app.get('/')
-def index():
-    return {'key': 'value'}
-
-
-@app.get('/cities')
-async def get_cities():
-    results = []
-    for address in db:
-        address_var = (address['city'], ' , ', address['state'],
-                       ' , ',   address['country'], ' , ', address['zipcode'])
-        print(address_var)
-        r = requests.get(
-            f'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address_var)) + '?format=json')
-        response_location = r.json()
-       
-        results.append(
-            {'city': address['city'], 'state': address['state'], 'country': address['country'], 'zipcode': address['zipcode'], 'latitude': response_location[0]["lat"], 'longitude': response_location[0]["lon"]})
-    print(results,"bhavana")
-
-    return results
-
-
-@app.get('/cities/{city_id}')
-def get_city(city_id: int):
-    print(city_id)
-    address = db[city_id-1]
-    address_var = (address['city'], ' , ', address['state'],
-                   ' , ',   address['country'], ' , ', address['zipcode'])
-    #print('address:, ', address, address_var)
-    r = requests.get(
-        f'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address_var)) + '?format=json')
-    response_location = r.json()
-    return {'city': address['city'], 'state': address['state'], 'country': address['country'], 'zipcode': address['zipcode'], 'latitude': response_location[0]["lat"], 'longitude': response_location[0]["lon"]}
-
-
-@app.post('/cities')
-def create_city(request: schemas.City,db:Session=Depends(get_db)):
-  
-    new_city=models.Address(
-        addressLine=request.addressLine,
-        city=request.city,
-        state=request.state,
-        zipcode=request.zipcode
-        )
-    db.add(new_city)
-    db.add(new_city)
-    db.refresh(new_city)
-
-    return {
-            "status": "ok",
-            "data": new_city
+@app.get("/getcities")
+def get_all(res: Response, db :Session = Depends(getDb)):
+    try:
+##get all the address data from the database 
+        details = db.query(models.Address).all()
+        return{"data": details,
+                "msg":"fetched successfully!!!!"}
+    except Exception as e:
+        res.status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        return{
+            "status":"error occured",
+            "msg":str(e)
         }
+
+##post routes i.e., posting the info
+@app.post("/postcities")
+def createCoordinates(reqbody: schemas.City,res:Response, db :Session = Depends(getDb)):  
+    try:
+        city = reqbody.city
+        state = reqbody.state
+        country=reqbody.country
+        zipcode = reqbody.zipcode
+        address=city,state,country,zipcode
+##passing the content into the my coordinates function    
+        Data = myCoordinates(address)
+
+        row = models.Address()
+##creating the row for the table
+        row.city = city
+        row.state = state
+        row.zipcode = zipcode
+        row.country=country
+        row.longitude =  Data[0]
+        row.latitude =  Data[1]
+
+
+##adding a row to the table
+        db.add(row)
+        db.commit()
+        return {"data":row,
+        "msg":"successfully added!!"}
+    except Exception as e:
+        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            "status" : "adding failed",
+            "msg" : str(e)
+        }
+
+##put routes i.e,updating the content
+@app.put("/putcities/{cityid}")
+def updating(res:Response,reqbody: schemas.City,cityid,db:Session=Depends(getDb)):
+    try:   
+        city = reqbody.city
+        state = reqbody.state
+        country=reqbody.country
+        zipcode = reqbody.zipcode
+        address=city,state,country,zipcode
+    
+        Data = myCoordinates(address)
+##updating the rows with the required fields
+        updatedRow ={}
+        updatedRow["city"] = city
+        updatedRow["state"] = state
+        updatedRow["zipcode"]= zipcode
+        updatedRow["longitude"] =  Data[0]
+        updatedRow["latitude"] = Data[1] 
         
-    # db.append(city.dict())
-    # return db[-1]
+        updating=db.query(models.Address).where(models.Address.id==cityid).update(updatedRow)
+        if updating:
+    ##   
+            db.commit() 
+    ##if data updated successfully
+            return updating,updatedRow
 
+    ##if data doesnot exist
+        else:     
+            return "not exists "
+    ##error occured enters the except block
+    except Exception as e:
+        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            "status" : "failed",
+            "msg" : str(e)
+        }
+    
+##deleting the information from the content
+@app.delete("/deleteingDetails/{cityid}")
+def delete(res:Response,cityid,db:Session=Depends(getDb)):
+    try:
+    ##deleting based on city id
+        deleting=db.query(models.Address).where(models.Address.id==cityid).delete()
+        
 
-@app.put("/cities/{city_id}")
-async def update_city(city_id: int, city: schemas.City):
-    put_address = city.dict()
-    print(put_address, city.dict())
-    return {"city_id": city_id, **put_address}
+        if deleting:  
+            db.commit()  
+            print(deleting)
+##if the info id successfully deleting
+            return {"data":deleting,
+                    "msg":"deleting successfully!!!"}
+##if the info is not existed      
+        else: 
+            return "not existed city"
 
-
-@app.delete('/cities/{city_id}')
-def delete_city(city_id: int):
-    db.pop(city_id-1)
-    return {}
+    ##error occured enters the except block
+    except Exception as e:
+        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            "status" : "failed",
+            "msg" : str(e)
+        }
 
 # {
 #   "city": "bihar",
@@ -212,3 +146,12 @@ def delete_city(city_id: int):
 #   "country": "string",
 #   "zipcode": "400001"
 # }
+
+
+
+
+
+
+
+
+
