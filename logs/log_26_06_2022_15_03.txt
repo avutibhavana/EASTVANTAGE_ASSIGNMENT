@@ -1,3 +1,12 @@
 2022-06-26 15:03:08,954 - INFO - Started server process [24140]
 2022-06-26 15:03:08,955 - INFO - Waiting for application startup.
 2022-06-26 15:03:08,956 - INFO - Application startup complete.
+2022-06-26 15:03:18,047 - INFO - printing the data
+2022-06-26 15:03:29,727 - INFO - POST request:success
+2022-06-26 15:03:56,132 - INFO - update request for based on 2
+2022-06-26 15:03:56,778 - INFO - returning request for 2
+2022-06-26 15:04:07,424 - INFO - delete request for cityid no: 3
+2022-06-26 15:04:07,431 - INFO - deleted cityid no: 3
+2022-06-26 15:04:13,294 - INFO - nearestCities request
+2022-06-26 15:04:13,937 - INFO -  returning nearestCities
+2022-06-26 15:04:20,120 - INFO - printing the data
