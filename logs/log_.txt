@@ -1,0 +1,6 @@
+2022-06-26 15:54:23,038 - INFO - Started server process [19472]
+2022-06-26 15:54:23,039 - INFO - Waiting for application startup.
+2022-06-26 15:54:23,040 - INFO - Application startup complete.
+2022-06-26 15:54:23,179 - INFO - Started server process [26260]
+2022-06-26 15:54:23,180 - INFO - Waiting for application startup.
+2022-06-26 15:54:23,181 - INFO - Application startup complete.

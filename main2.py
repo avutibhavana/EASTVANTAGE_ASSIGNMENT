@@ -10,23 +10,29 @@ from datetime import datetime
 import logging
 
 
-now = datetime.now()
-time = now.strftime("%d_%m_%Y_%H_%M")
-file_name = f'logs/log_{time}.txt'
+####implementation of logging
+
+file_name = f'logs/log.txt'
 logging.basicConfig(filename=file_name, filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-
+####Initiating the app
 app = FastAPI()
+
+##finding the coordinates by using this mycoordinate function whenever needed 
 
 def myCoordinates(address):   
     output = requests.get('https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address)) + '?format=json').json()
     a=[output[0]["lat"] , output[0]["lon"]]
     return a
 
+####creating a table from models in sqlite database
+
 models.Base.metadata.create_all(engine)
+
+##connection to database
 
 def getDb():
     db= SessionLocal()
@@ -54,7 +60,7 @@ def get_all(res: Response, db :Session = Depends(getDb)):
             "msg":str(e)
         }
 
-##post routes i.e., posting the info
+##post routes i.e., posting the information
 @app.post("/postcities")
 def createCoordinates(reqbody: schemas.City,res:Response, db :Session = Depends(getDb)):  
     try:
