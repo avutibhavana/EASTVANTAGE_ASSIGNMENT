@@ -1,5 +1,3 @@
-from numbers import Real
-from time import timezone
 import schemas,models
 from database import SessionLocal,engine
 from sqlalchemy.orm import Session
@@ -8,6 +6,18 @@ from pydantic import BaseModel
 import requests
 import urllib.parse
 from math import radians, cos, sin, asin, sqrt
+from datetime import datetime
+import logging
+
+
+now = datetime.now()
+time = now.strftime("%d_%m_%Y_%H_%M")
+file_name = f'logs/log_{time}.txt'
+logging.basicConfig(filename=file_name, filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 app = FastAPI()
 
@@ -15,7 +25,6 @@ def myCoordinates(address):
     output = requests.get('https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(str(address)) + '?format=json').json()
     a=[output[0]["lat"] , output[0]["lon"]]
     return a
-
 
 models.Base.metadata.create_all(engine)
 
@@ -34,10 +43,12 @@ def get_all(res: Response, db :Session = Depends(getDb)):
     try:
 ##get all the address data from the database 
         details = db.query(models.Address).all()
+        logger.info("printing the data")
         return{"data": details,
                 "msg":"fetched successfully!!!!"}
     except Exception as e:
         res.status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.error("unable to find the data")
         return{
             "status":"error occured",
             "msg":str(e)
@@ -64,14 +75,15 @@ def createCoordinates(reqbody: schemas.City,res:Response, db :Session = Depends(
         row.longitude =  Data[1]
         row.latitude =  Data[0]
 
-
 ##adding a row to the table
         db.add(row)
         db.commit()
+        logger.info(f"POST request:success")
         return {"data":row,
         "msg":"successfully added!!"}
     except Exception as e:
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.error(f"Db error:{e}")
         return {
             "status" : "adding failed",
             "msg" : str(e)
@@ -79,14 +91,15 @@ def createCoordinates(reqbody: schemas.City,res:Response, db :Session = Depends(
 
 ##put routes i.e,updating the content
 @app.put("/putcities/{cityid}")
-def updating(res:Response,reqbody: schemas.City,cityid,db:Session=Depends(getDb)):
+def updating(res:Response,reqbody:schemas.City,cityid,db:Session=Depends(getDb)):
+    logger.info(f"update request for based on {cityid}")
     try:   
         city = reqbody.city
         state = reqbody.state
         country=reqbody.country
         zipcode = reqbody.zipcode
         address=city,state,country,zipcode
-    
+   
         Data = myCoordinates(address)
 ##updating the rows with the required fields
         updatedRow ={
@@ -98,33 +111,35 @@ def updating(res:Response,reqbody: schemas.City,cityid,db:Session=Depends(getDb)
         }
         updating=db.query(models.Address).where(models.Address.id==cityid).update(updatedRow)
         if updating:
-    ##   
-            db.commit() 
+            db.commit()
+            logger.info(f"returning request for {cityid}")
     ##if data updated successfully
             return updating,updatedRow
 
     ##if data doesnot exist
-        else:     
+        else:   
             return "not exists "
     ##error occured enters the except block
     except Exception as e:
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.error(f"Db error:{e}")
         return {
             "status" : "failed",
             "msg" : str(e)
         }
-    
+   
 ##deleting the information from the content
 @app.delete("/deleteingDetails/{cityid}")
 def delete(res:Response,cityid,db:Session=Depends(getDb)):
+    logger.info(f"delete request for cityid no: {cityid}")
     try:
     ##deleting based on city id
         deleting=db.query(models.Address).where(models.Address.id==cityid).delete()
-        
-
+    
         if deleting:  
-            db.commit()  
-            print(deleting)
+            db.commit() 
+            logger.info(f"deleted cityid no: {cityid}") 
+            
 ##if the info id successfully deleting
             return {"data":deleting,
                     "msg":"deleting successfully!!!"}
@@ -135,6 +150,7 @@ def delete(res:Response,cityid,db:Session=Depends(getDb)):
     ##error occured enters the except block
     except Exception as e:
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.info("no city with this cityid " + cityid)
         return {
             "status" : "failed",
             "msg" : str(e)
@@ -159,6 +175,7 @@ Replicating the same formula as mentioned in Wiki
 
 @app.get("/fetchnearestaddress", status_code=status.HTTP_200_OK)
 def get_nearest_address(res: Response,  city, state,country,zipcode, db :Session = Depends(getDb)):
+    logger.info(f"nearestCities request")
     try:
         address= city, state,country,zipcode
 
@@ -168,15 +185,14 @@ def get_nearest_address(res: Response,  city, state,country,zipcode, db :Session
 
         someAddress = []
 
-
         for address in allAddress:
                 
             distanceBetween = dist(float(locationData[0]), float(locationData[1]),address.latitude, address.longitude)
             if distanceBetween <= 100:
                 someAddress.append(address)
         
-
         # sending the nearest address data to user
+        logger.info(f" returning nearestCities")
         return {
             "status": "ok",
             "data" : someAddress
@@ -186,18 +202,11 @@ def get_nearest_address(res: Response,  city, state,country,zipcode, db :Session
         locationData = myCoordinates(address)
         quaryCoordinate = locationData
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.error(f"Db error: not found")
         return {
             "status" : quaryCoordinate,
-            "msg" : str(e)
-  
-            
+            "msg" : str(e)              
         }
-
-
-
-
-
-
 
 # {
 #   "city": "bihar",
@@ -205,6 +214,16 @@ def get_nearest_address(res: Response,  city, state,country,zipcode, db :Session
 #   "country": "string",
 #   "zipcode": "400001"
 # }
+
+
+
+
+
+
+
+
+
+
 
 
 

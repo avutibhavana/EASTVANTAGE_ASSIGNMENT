@@ -1,0 +1,77 @@
+2022-06-26 14:33:12,793 - INFO - Started server process [31936]
+2022-06-26 14:33:12,794 - INFO - Waiting for application startup.
+2022-06-26 14:33:12,794 - INFO - Application startup complete.
+2022-06-26 14:38:52,175 - INFO - printing the data
+2022-06-26 14:39:14,105 - INFO - POST request:success
+2022-06-26 14:39:26,809 - INFO - printing the data
+2022-06-26 14:39:52,950 - INFO - update request for based on 1
+2022-06-26 14:39:53,841 - ERROR - Db error:list index out of range
+2022-06-26 14:41:02,919 - INFO - update request for based on 1
+2022-06-26 14:41:04,070 - INFO - returning request for 1
+2022-06-26 14:41:17,026 - INFO - printing the data
+2022-06-26 14:42:11,387 - INFO - delete request for cityid no: 1
+2022-06-26 14:42:11,394 - INFO - deleted cityid no: 1
+2022-06-26 14:42:24,071 - INFO - POST request:success
+2022-06-26 14:42:59,064 - INFO - nearestCities request
+2022-06-26 14:42:59,991 - INFO -  returning nearestCities
+2022-06-26 14:43:19,680 - INFO - nearestCities request
+2022-06-26 14:43:20,304 - INFO -  returning nearestCities
+2022-06-26 14:44:18,202 - INFO - nearestCities request
+2022-06-26 14:44:19,074 - INFO -  returning nearestCities
+2022-06-26 14:44:46,719 - INFO - nearestCities request
+2022-06-26 14:44:48,298 - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\.\main2.py", line 402, in get_nearest_address
+    locationData = myCoordinates(address)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\.\main2.py", line 246, in myCoordinates
+    a=[output[0]["lat"] , output[0]["lon"]]
+IndexError: list index out of range
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 366, in run_asgi
+    result = await app(self.scope, self.receive, self.send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\uvicorn\middleware\proxy_headers.py", line 75, in __call__
+    return await self.app(scope, receive, send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\fastapi\applications.py", line 269, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\applications.py", line 124, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\middleware\errors.py", line 184, in __call__
+    raise exc
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\middleware\errors.py", line 162, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\exceptions.py", line 93, in __call__
+    raise exc
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\exceptions.py", line 82, in __call__
+    await self.app(scope, receive, sender)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\fastapi\middleware\asyncexitstack.py", line 21, in __call__
+    raise e
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\routing.py", line 670, in __call__
+    await route.handle(scope, receive, send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\routing.py", line 266, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\routing.py", line 65, in app
+    response = await func(request)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\fastapi\routing.py", line 227, in app
+    raw_response = await run_endpoint_function(
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\fastapi\routing.py", line 162, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\starlette\concurrency.py", line 41, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\anyio\to_thread.py", line 31, in run_sync
+    return await get_asynclib().run_sync_in_worker_thread(
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\anyio\_backends\_asyncio.py", line 937, in run_sync_in_worker_thread
+    return await future
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\lib\site-packages\anyio\_backends\_asyncio.py", line 867, in run
+    result = context.run(func, *args)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\.\main2.py", line 422, in get_nearest_address
+    locationData = myCoordinates(address)
+  File "C:\Users\avuti\Downloads\EastVantage\fastapi-env\.\main2.py", line 246, in myCoordinates
+    a=[output[0]["lat"] , output[0]["lon"]]
+IndexError: list index out of range
+2022-06-26 14:46:07,441 - INFO - nearestCities request
+2022-06-26 14:46:08,098 - INFO -  returning nearestCities

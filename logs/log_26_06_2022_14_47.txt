@@ -1,0 +1,23 @@
+2022-06-26 14:47:18,933 - INFO - Started server process [22504]
+2022-06-26 14:47:18,934 - INFO - Waiting for application startup.
+2022-06-26 14:47:18,935 - INFO - Application startup complete.
+2022-06-26 14:47:22,145 - INFO - nearestCities request
+2022-06-26 14:47:22,807 - INFO -  returning nearestCities
+2022-06-26 14:49:27,329 - INFO - printing the data
+2022-06-26 14:50:20,901 - INFO - POST request:success
+2022-06-26 14:50:30,308 - INFO - POST request:success
+2022-06-26 14:50:33,874 - INFO - printing the data
+2022-06-26 14:51:17,457 - INFO - update request for based on 2
+2022-06-26 14:51:18,441 - INFO - returning request for 2
+2022-06-26 14:51:30,115 - INFO - delete request for cityid no: 2
+2022-06-26 14:51:30,125 - INFO - deleted cityid no: 2
+2022-06-26 14:51:39,495 - INFO - delete request for cityid no: 3
+2022-06-26 14:51:39,503 - INFO - deleted cityid no: 3
+2022-06-26 14:51:54,328 - INFO - nearestCities request
+2022-06-26 14:51:54,949 - INFO -  returning nearestCities
+2022-06-26 14:52:11,217 - INFO - printing the data
+2022-06-26 14:52:31,176 - INFO - POST request:success
+2022-06-26 14:52:34,598 - INFO - printing the data
+2022-06-26 14:53:22,375 - INFO - POST request:success
+2022-06-26 14:54:04,370 - ERROR - Db error:list index out of range
+2022-06-26 14:54:26,003 - ERROR - Db error:list index out of range

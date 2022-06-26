@@ -1,0 +1,7 @@
+2022-06-26 14:55:12,235 - INFO - Started server process [28968]
+2022-06-26 14:55:12,236 - INFO - Waiting for application startup.
+2022-06-26 14:55:12,237 - INFO - Application startup complete.
+2022-06-26 14:57:31,313 - INFO - POST request:success
+2022-06-26 14:57:55,652 - INFO - POST request:success
+2022-06-26 14:58:05,384 - INFO - POST request:success
+2022-06-26 14:58:15,172 - INFO - printing the data

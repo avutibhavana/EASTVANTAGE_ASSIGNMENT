@@ -6,3 +6,5 @@ class City(BaseModel):
     state: str
     country: str
     zipcode: str
+
+

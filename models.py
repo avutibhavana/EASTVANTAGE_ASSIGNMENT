@@ -7,7 +7,7 @@ from sqlalchemy import Column,Integer,String,Float
 
 
 class Address(Base):
-    __tablename__="address"
+    __tablename__="addresses"
 
    
     id = Column(Integer, primary_key=True, index=True)
